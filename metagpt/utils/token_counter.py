@@ -39,6 +39,8 @@ TOKEN_COSTS = {
     "gpt-4-vision-preview": {"prompt": 0.01, "completion": 0.03},  # TODO add extra image price calculator
     "gpt-4-1106-vision-preview": {"prompt": 0.01, "completion": 0.03},
     "gpt-4o": {"prompt": 0.005, "completion": 0.015},
+    # Placeholder pricing for gpt-5; update when official
+    "gpt-5": {"prompt": 0.005, "completion": 0.015},
     "gpt-4o-mini": {"prompt": 0.00015, "completion": 0.0006},
     "gpt-4o-mini-2024-07-18": {"prompt": 0.00015, "completion": 0.0006},
     "gpt-4o-2024-05-13": {"prompt": 0.005, "completion": 0.015},
@@ -78,6 +80,8 @@ TOKEN_COSTS = {
     "openai/gpt-4": {"prompt": 0.03, "completion": 0.06},  # start, for openrouter
     "openai/gpt-4-turbo": {"prompt": 0.01, "completion": 0.03},
     "openai/gpt-4o": {"prompt": 0.005, "completion": 0.015},
+    # Placeholder pricing for gpt-5 via OpenRouter-style prefix
+    "openai/gpt-5": {"prompt": 0.005, "completion": 0.015},
     "openai/gpt-4o-2024-05-13": {"prompt": 0.005, "completion": 0.015},
     "openai/gpt-4o-mini": {"prompt": 0.00015, "completion": 0.0006},
     "openai/gpt-4o-mini-2024-07-18": {"prompt": 0.00015, "completion": 0.0006},
@@ -250,6 +254,8 @@ TOKEN_MAX = {
     "o1-mini": 128000,
     "o1-mini-2024-09-12": 128000,
     "gpt-4o": 128000,
+    # Assume gpt-5 has at least 128k context; update if needed
+    "gpt-5": 128000,
     "gpt-4o-2024-05-13": 128000,
     "gpt-4o-2024-08-06": 128000,
     "gpt-4o-mini-2024-07-18": 128000,
@@ -298,6 +304,7 @@ TOKEN_MAX = {
     "openai/gpt-4": 8192,  # start, for openrouter
     "openai/gpt-4-turbo": 128000,
     "openai/gpt-4o": 128000,
+    "openai/gpt-5": 128000,
     "openai/gpt-4o-2024-05-13": 128000,
     "openai/gpt-4o-mini": 128000,
     "openai/gpt-4o-mini-2024-07-18": 128000,
@@ -461,6 +468,7 @@ def count_message_tokens(messages, model="gpt-3.5-turbo-0125"):
         "gpt-4o-2024-08-06",
         "gpt-4o-mini",
         "gpt-4o-mini-2024-07-18",
+        "gpt-5",
         "o1-preview",
         "o1-preview-2024-09-12",
         "o1-mini",
