@@ -12,10 +12,51 @@ import logging
 import os
 import re
 import uuid
+from pathlib import Path
 from typing import Callable
+from unittest.mock import DEFAULT, patch
+
+import pytest
+
+os.environ.setdefault("OPENAI_API_KEY", "sk-test")
+
+_CONFIG_TEMPLATE = """
+llm:
+  api_type: "openai"
+  model: "gpt-4-turbo"
+  base_url: "https://api.openai.com/v1"
+  api_key: "sk-test"
+"""
+
+_user_config = Path.home() / ".metagpt" / "config2.yaml"
+_user_config.parent.mkdir(parents=True, exist_ok=True)
+_user_config.write_text(_CONFIG_TEMPLATE, encoding="utf-8")
+
+
+class _SimpleMocker:
+    def __init__(self):
+        self._patches = []
+
+    def patch(self, target, new=DEFAULT, **kwargs):
+        patcher = patch(target, new=new, **kwargs)
+        mocked = patcher.start()
+        self._patches.append(patcher)
+        return mocked
+
+    def stopall(self):
+        while self._patches:
+            self._patches.pop().stop()
+
+
+@pytest.fixture
+def mocker():
+    manager = _SimpleMocker()
+    try:
+        yield manager
+    finally:
+        manager.stopall()
 
 import aiohttp.web
-import pytest
 
 from metagpt.const import DEFAULT_WORKSPACE_ROOT, TEST_DATA_PATH
 from metagpt.context import Context as MetagptContext
