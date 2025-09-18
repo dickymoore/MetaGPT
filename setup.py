@@ -116,6 +116,7 @@ setup(
     entry_points={
         "console_scripts": [
             "metagpt=metagpt.software_company:app",
+            "codex=metagpt.codex_cli:app",
         ],
     },
     include_package_data=True,
