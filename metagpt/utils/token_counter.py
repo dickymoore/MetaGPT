@@ -10,10 +10,41 @@ ref3: https://github.com/Significant-Gravitas/Auto-GPT/blob/master/autogpt/llm/t
 ref4: https://github.com/hwchase17/langchain/blob/master/langchain/chat_models/openai.py
 ref5: https://ai.google.dev/models/gemini
 """
+from functools import lru_cache
+
 import anthropic
 import tiktoken
 
 from metagpt.logs import logger
+
+
+FALLBACK_MODEL_PREFIX_TO_ENCODING = {
+    "gpt-5": "cl100k_base",
+}
+
+_warned_missing_models: set[str] = set()
+
+
+@lru_cache(maxsize=None)
+def _encoding_for_model(model: str):
+    """Return a tiktoken encoding for the given model with graceful fallbacks."""
+    try:
+        return tiktoken.encoding_for_model(model)
+    except KeyError:
+        encoding_name = None
+        for prefix, fallback_encoding in FALLBACK_MODEL_PREFIX_TO_ENCODING.items():
+            if model.startswith(prefix):
+                encoding_name = fallback_encoding
+                break
+        encoding_name = encoding_name or "cl100k_base"
+        if model not in _warned_missing_models:
+            logger.debug(
+                "Model %s not found in tiktoken registry. Falling back to %s encoding.",
+                model,
+                encoding_name,
+            )
+            _warned_missing_models.add(model)
+        return tiktoken.get_encoding(encoding_name)
 
 TOKEN_COSTS = {
     "anthropic/claude-3.5-sonnet": {"prompt": 0.003, "completion": 0.015},
@@ -439,11 +470,7 @@ def count_message_tokens(messages, model="gpt-3.5-turbo-0125"):
     if "claude" in model:
         num_tokens = count_claude_message_tokens(messages, model)
         return num_tokens
-    try:
-        encoding = tiktoken.encoding_for_model(model)
-    except KeyError:
-        logger.info(f"Warning: model {model} not found in tiktoken. Using cl100k_base encoding.")
-        encoding = tiktoken.get_encoding("cl100k_base")
+    encoding = _encoding_for_model(model)
     if model in {
         "gpt-3.5-turbo-0613",
         "gpt-3.5-turbo-16k-0613",
@@ -475,6 +502,9 @@ def count_message_tokens(messages, model="gpt-3.5-turbo-0125"):
         "o1-mini-2024-09-12",
     }:
         tokens_per_message = 3  # # every reply is primed with <|start|>assistant<|message|>
+        tokens_per_name = 1
+    elif model.startswith("gpt-5"):
+        tokens_per_message = 3
         tokens_per_name = 1
     elif model == "gpt-3.5-turbo-0301":
         tokens_per_message = 4  # every message follows <|start|>{role/name}\n{content}<|end|>\n
@@ -530,11 +560,7 @@ def count_output_tokens(string: str, model: str) -> int:
         messages = [{"role": "assistant", "content": string}]
         num_tokens = count_claude_message_tokens(messages, model)
         return num_tokens
-    try:
-        encoding = tiktoken.encoding_for_model(model)
-    except KeyError:
-        logger.info(f"Warning: model {model} not found in tiktoken. Using cl100k_base encoding.")
-        encoding = tiktoken.get_encoding("cl100k_base")
+    encoding = _encoding_for_model(model)
     return len(encoding.encode(string))
 
 
