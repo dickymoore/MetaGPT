@@ -6,6 +6,7 @@
 @File    : __init__.py
 """
 
+from metagpt.provider.codex_cli_llm import CodexCliLLM
 from metagpt.provider.google_gemini_api import GeminiLLM
 from metagpt.provider.ollama_api import OllamaLLM
 from metagpt.provider.openai_api import OpenAILLM
@@ -28,6 +29,7 @@ __all__ = [
     "AzureOpenAILLM",
     "MetaGPTLLM",
     "OllamaLLM",
+    "CodexCliLLM",
     "HumanProvider",
     "SparkLLM",
     "QianFanLLM",

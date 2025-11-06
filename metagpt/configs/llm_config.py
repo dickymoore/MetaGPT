@@ -27,6 +27,7 @@ class LLMType(Enum):
     GEMINI = "gemini"
     METAGPT = "metagpt"
     AZURE = "azure"
+    CODEX_CLI = "codex_cli"
     OLLAMA = "ollama"  # /chat at ollama api
     OLLAMA_GENERATE = "ollama.generate"  # /generate at ollama api
     OLLAMA_EMBEDDINGS = "ollama.embeddings"  # /embeddings at ollama api
@@ -74,6 +75,12 @@ class LLMConfig(YamlModel):
     app_id: Optional[str] = None
     api_secret: Optional[str] = None
     domain: Optional[str] = None
+
+    # Codex CLI specific settings
+    cli_executable: Optional[str] = None
+    cli_default_args: Optional[list[str]] = None
+    cli_completion_args: Optional[list[str]] = None
+    cli_environment: Optional[dict[str, str]] = None
 
     # For Chat Completion
     max_token: int = 4096
