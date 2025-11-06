@@ -1,0 +1,45 @@
+# Codex CLI configuration for the MetaGPT repository.
+# The schema describes the common workflows Codex CLI should expose when operating on this repo.
+version: 1
+project:
+  name: MetaGPT
+  description: |
+    Multi-agent framework for orchestrating GPT-based roles. The configuration below exposes
+    standard bootstrap, lint, format, and test workflows so the Codex CLI can run them reliably.
+  homepage: https://github.com/geekan/MetaGPT
+runtime:
+  python: ">=3.9,<3.12"
+  node: ">=20"
+workspace:
+  root: .
+  setup:
+    - description: Create a local virtual environment and install python dependencies.
+      run: .codex/bin/bootstrap.sh
+commands:
+  setup:
+    description: Create or update the virtual environment with all required dependencies.
+    run: .codex/bin/bootstrap.sh
+  lint:
+    description: Run the fast static-analysis suite.
+    run: .codex/bin/lint.sh
+  format:
+    description: Format the Python sources using Ruff's formatter.
+    run: .codex/bin/format.sh
+  test:
+    description: Execute the pytest suite with useful defaults for CI and local smoke tests.
+    run: .codex/bin/test.sh
+tasks:
+  - name: setup
+    description: Ensure dependencies are installed (alias for the setup command).
+    command: .codex/bin/bootstrap.sh
+  - name: lint
+    description: Run Ruff over the repository.
+    command: .codex/bin/lint.sh
+  - name: format
+    description: Apply Ruff formatting in-place.
+    command: .codex/bin/format.sh
+  - name: test
+    description: Execute pytest against the test suite.
+    command: .codex/bin/test.sh
+ci:
+  default_task: test
